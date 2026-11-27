@@ -114,6 +114,8 @@ Open `http://127.0.0.1:7860`. Choose single-image processing, batch processing, 
 
 This 1 min 33 sec video shows a single-image run with Distill-Any-Depth, MLS-BRN, and local ATL03 files. It covers the full workflow and ends with the 2D height raster and the interactive LoD1 model for 1,508 buildings. The processing stages are shown in time-lapse.
 
+https://github.com/user-attachments/assets/248dcf1d-5f0b-4047-a169-eed7bacafc4f
+
 ### Single image from the command line
 
 ```bash
