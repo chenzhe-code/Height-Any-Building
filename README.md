@@ -110,6 +110,10 @@ python scripts/run_ui.py --data-root /path/to/imagery --data-root /path/to/atl03
 
 Open `http://127.0.0.1:7860`. Choose single-image processing, batch processing, or the CPU self-check. The default primary model for real imagery is Distill-Any-Depth. Use the advanced settings to enable cross-tile optimization. The results tab supports panning and zooming the 2D map, switching to the interactive LOD1 preview, and downloading the original GeoTIFF and GeoJSON. The LOD1 preview requires WebGL.
 
+#### Wuhan Guanggu walkthrough
+
+This 1 min 33 sec video shows a single-image run with Distill-Any-Depth, MLS-BRN, and local ATL03 files. It covers the full workflow and ends with the 2D height raster and the interactive LoD1 model for 1,508 buildings. The processing stages are shown in time-lapse.
+
 ### Single image from the command line
 
 ```bash
