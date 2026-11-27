@@ -1,0 +1,6 @@
+-r requirements-depth.txt
+diffusers==0.29.2
+timm==1.0.28
+safetensors==0.8.0
+huggingface-hub==1.29.0
+matplotlib==3.10.9

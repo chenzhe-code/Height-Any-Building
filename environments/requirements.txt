@@ -1,0 +1,19 @@
+# Core algorithm and photon runtime; Python 3.10 is the validated version.
+numpy==1.26.4
+scipy==1.15.2
+rasterio==1.4.3
+geopandas==1.1.4
+shapely==2.1.2
+pandas==2.3.3
+scikit-learn==1.7.2
+h5py==3.16.0
+opencv-python-headless==4.9.0.80
+matplotlib==3.10.9
+tqdm>=4.65,<5
+openpyxl==3.1.5
+requests>=2.31,<3
+threadpoolctl==3.6.0
+cloth-simulation-filter==1.1.5
+pycocotools>=2.0.7,<3
+# Install matching GDAL native libraries/Python bindings via conda-forge;
+# see environments/README.md. Neural model dependencies use separate files in this directory.

@@ -1,0 +1,58 @@
+HeightAnyBuilding Non-Commercial Research License, Version 1.0
+
+Copyright remains with the respective HeightAnyBuilding copyright holders.
+
+1. Scope
+
+This license applies only to original HeightAnyBuilding code and original
+HeightAnyBuilding contributions to modified files. Third-party code, models,
+weights, datasets and dependencies retain their own licenses. See
+THIRD_PARTY_NOTICES.md and the license files in the relevant subdirectories.
+Nothing in this license restricts rights independently granted by a third-party
+license, or grants rights that the HeightAnyBuilding copyright holders do not own.
+
+2. Permitted use
+
+Permission is granted, without charge, to use, copy and modify the covered code
+solely for non-commercial scientific research. Research by universities,
+non-profit research institutions and independent researchers is permitted only
+when it is not conducted for a commercial purpose or on behalf of a commercial
+enterprise. Publishing research papers and reporting research results is permitted.
+
+3. Uses requiring separate permission
+
+Any use by or on behalf of a commercial enterprise, including internal research,
+development, product evaluation and commercial deployment, requires prior
+separate written permission from the relevant copyright holders. Commercial
+products, paid services, consulting and other commercial exploitation of the
+covered code are not permitted under this license.
+
+4. Redistribution and modifications
+
+Non-commercial redistribution of the covered source code, including modified
+versions, is permitted for the research purposes stated above. Keep this license,
+all applicable copyright and attribution notices, and all third-party notices.
+Clearly identify modifications. Redistributed original HeightAnyBuilding code
+and modifications to that covered code must remain subject to these terms;
+do not grant recipients broader rights to the covered code than this license.
+Third-party portions remain governed by their own licenses.
+
+5. No trademark or third-party rights
+
+This license grants no trademark rights and no rights to unpublished datasets,
+model checkpoints or other separately distributed materials. Obtain any required
+third-party permissions independently. Separate permission requests should be
+directed to the HeightAnyBuilding project maintainers or relevant copyright holder.
+
+6. Disclaimer
+
+THE COVERED CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NON-INFRINGEMENT. TO THE EXTENT PERMITTED BY LAW, THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS SHALL NOT BE LIABLE FOR CLAIMS, DAMAGES OR OTHER
+LIABILITY ARISING FROM THE CODE OR ITS USE.
+
+7. Termination
+
+Permission under this license terminates if you violate these terms. Rights
+independently granted under third-party licenses are unaffected.

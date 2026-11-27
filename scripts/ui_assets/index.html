@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HeightAnyBuilding · 武汉大学空间智能研究所</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/lod1.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div><strong>HeightAnyBuilding</strong><h1>武汉大学空间智能研究所</h1></div>
+      </div>
+      <div class="topbar-actions">
+        <button type="button" class="mode utility" data-mode="demo" aria-pressed="false">CPU 自检</button>
+        <div id="connection" class="connection" role="status">正在连接本机</div>
+      </div>
+    </div>
+  </header>
+  <main class="workspace">
+    <div class="columns">
+      <aside class="work-sidebar" aria-label="任务侧栏">
+        <nav class="sidebar-tabs" aria-label="侧栏视图">
+          <button type="button" data-sidebar="compose" aria-controls="compose" aria-pressed="true">任务配置</button>
+          <button type="button" data-sidebar="history" aria-controls="history" aria-pressed="false">运行记录 <span id="job-count" class="count">0</span></button>
+        </nav>
+        <section id="compose" class="editor" aria-labelledby="compose-title">
+        <header class="card-header">
+          <h2 id="compose-title">新建任务</h2>
+          <button id="back-to-setup" type="button" class="button secondary" hidden>返回任务配置</button>
+        </header>
+        <div id="processing-modes" class="mode-bar" aria-label="处理方式">
+          <button type="button" class="mode active" data-mode="image" aria-pressed="true">单图处理</button>
+          <button type="button" class="mode" data-mode="batch" aria-pressed="false">批处理</button>
+        </div>
+        <form id="task-form" autocomplete="off">
+          <div id="demo-fields" class="demo" hidden>
+            <p>使用 6 栋已知高度的合成建筑，检查尺度校准、窗口融合、逐栋赋高和结果显示。通过条件为 6 栋都有有效高度，最大误差不超过 1 米。</p>
+            <p>处理真实影像前，可用「检查环境」核对模型权重与 GPU 依赖。</p>
+          </div>
+          <div id="real-fields">
+            <section class="form-section" aria-labelledby="input-section-title">
+              <h3 id="input-section-title">输入数据</h3>
+              <label id="input-label" for="input">输入 GeoTIFF</label>
+              <div class="path-field">
+                <input id="input" name="input" placeholder="/path/to/image.tif" spellcheck="false" required>
+                <button type="button" class="button secondary picker-button" data-target="input">选择</button>
+              </div>
+              <p class="field-note" id="input-note">支持带坐标系的三波段 UInt8 RGB 影像。</p>
+            </section>
+            <section class="form-section" aria-labelledby="model-section-title">
+              <h3 id="model-section-title">模型设置</h3>
+              <label for="model">深度／高度估计基础模型</label>
+              <select id="model" name="model"><option value="auto">自动选择</option></select>
+              <div class="field-row">
+                <div>
+                  <label for="offset-model">建筑物偏移提取模型</label>
+                  <select id="offset-model" name="offset_model" aria-describedby="building-model-note"></select>
+                </div>
+                <div>
+                  <label for="footprint-model">建筑物足迹提取模型</label>
+                  <select id="footprint-model" name="footprint_model" aria-describedby="building-model-note"></select>
+                </div>
+              </div>
+              <p class="field-note" id="building-model-note">MLS-BRN 一次推理同时生成建筑物偏移和足迹。</p>
+              <div class="gpu-field">
+                <label for="gpus">GPU 编号</label>
+                <input id="gpus" name="gpus" value="0" placeholder="0,1" pattern="[0-9]+(,[0-9]+)*">
+              </div>
+            </section>
+            <details id="advanced" class="advanced">
+              <summary>高级设置</summary>
+              <div class="advanced-body">
+                <div id="image-options">
+                  <div class="field-row">
+                    <div><label for="tile-size">瓦片尺寸（像素）</label><input id="tile-size" name="tile_size" type="number" min="2048" placeholder="5000"></div>
+                    <div><label for="target-crs">目标坐标系</label><input id="target-crs" name="target_crs" placeholder="自动"></div>
+                  </div>
+                  <label for="global-mode">跨瓦片联合优化</label>
+                  <select id="global-mode" name="global_mode" aria-describedby="optimization-note">
+                    <option value="auto">自动（SynRS3D 多瓦片）</option>
+                    <option value="patch">开启</option>
+                    <option value="none">关闭</option>
+                  </select>
+                </div>
+                <div class="field-row">
+                  <div><label for="window-size">推理窗口（像素）</label><input id="window-size" name="window_size" type="number" min="1" step="1" placeholder="1024"></div>
+                  <div><label for="overlap">窗口重叠率</label><input id="overlap" name="overlap" type="number" min="0" step="any" placeholder="0.5"></div>
+                </div>
+                <div class="field-row">
+                  <div><label for="min-photon-controls">最少光子控制点</label><input id="min-photon-controls" name="min_photon_controls" type="number" min="1" step="1" placeholder="4"></div>
+                  <div><label for="ground-filter">地面滤波</label><select id="ground-filter" name="ground_filter"><option value="auto">自动</option><option value="on">开启</option><option value="off">关闭</option></select></div>
+                </div>
+                <label class="checkbox-line" id="batch-options" hidden>
+                  <input id="global-optimize" name="global_optimize" type="checkbox" aria-describedby="optimization-note"> 跨瓦片联合优化
+                </label>
+                <p class="field-note" id="optimization-note">联合优化使用各瓦片已校准的高度窗口。开启时，SynRS3D 单独预测接缝，需要对应的权重和运行环境。所有基础模型均可手动开启。</p>
+              </div>
+            </details>
+            <section class="form-section" aria-labelledby="photon-section-title">
+              <h3 id="photon-section-title">ATL03 光子数据</h3>
+              <label for="atl03-source">数据来源</label>
+              <select id="atl03-source" name="atl03_source">
+                <option value="online">通过 Earthdata 下载</option>
+                <option value="local">使用本机 HDF5 文件</option>
+              </select>
+              <div id="online-fields">
+                <div id="earthdata-credentials" class="credentials">
+                  <div><label for="earthdata-username">Earthdata 登录名</label><input id="earthdata-username" name="earthdata_username" autocapitalize="none" spellcheck="false"></div>
+                  <div><label for="earthdata-password">Earthdata 密码</label><input id="earthdata-password" name="earthdata_password" type="password" autocomplete="new-password"></div>
+                </div>
+                <p class="field-note" id="earthdata-note">首次在线运行时填写，之后在本次浏览器会话中复用。</p>
+                <div id="earthdata-saved" class="earthdata-saved" hidden>
+                  <span role="status">已保存 Earthdata 凭据</span>
+                  <button type="button" class="button secondary" id="clear-earthdata">清除凭据</button>
+                </div>
+                <details class="date-filter">
+                  <summary>筛选下载日期</summary>
+                  <div class="field-row dates">
+                    <div><label for="start-date">开始日期</label><input id="start-date" name="start_date" type="date"></div>
+                    <div><label for="end-date">结束日期</label><input id="end-date" name="end_date" type="date"></div>
+                  </div>
+                  <p class="field-note">日期留空时使用当前流程的默认范围。</p>
+                </details>
+              </div>
+              <div id="local-fields" hidden>
+                <label for="atl03-dir" class="visually-hidden">ATL03 文件目录</label>
+                <div class="path-field">
+                  <input id="atl03-dir" name="atl03_dir" placeholder="/path/to/ATL03" spellcheck="false">
+                  <button type="button" class="button secondary picker-button" data-target="atl03-dir">选择</button>
+                </div>
+                <p class="field-note">选择直接包含本次所用 .h5 文件的目录。</p>
+              </div>
+            </section>
+          </div>
+          <footer class="form-footer">
+            <p class="error" id="form-error" role="alert" hidden></p>
+            <div class="actions">
+              <button type="submit" class="button primary" value="run" id="start-button">开始运行</button>
+              <button type="submit" class="button secondary optional-action" value="preview">预览计划</button>
+              <button type="submit" class="button secondary optional-action" value="check">检查环境</button>
+            </div>
+            <details class="workspace-note"><summary>任务目录</summary><code id="work-root">正在读取…</code></details>
+          </footer>
+        </form>
+        </section>
+        <section id="history" aria-labelledby="history-title" hidden>
+          <header class="card-header"><h2 id="history-title">运行记录</h2></header>
+          <p id="history-empty" class="empty">运行、预览和环境检查记录会出现在这里。</p>
+          <div id="job-list" class="job-list"></div>
+        </section>
+      </aside>
+      <div class="activity">
+        <section id="workspace-empty" class="empty-view" aria-labelledby="empty-title">
+          <div class="empty-view-copy">
+            <h2 id="empty-title">成果与进度</h2>
+            <p>运行任务后在这里查看二维高度图与 LOD1。也可以从「运行记录」打开已有任务。</p>
+          </div>
+        </section>
+        <section class="detail" id="detail" aria-labelledby="detail-title" hidden>
+          <header class="card-header">
+            <div>
+              <h2 id="detail-title">任务详情</h2>
+              <p id="detail-time" class="muted"></p>
+            </div>
+            <span id="detail-status" class="state" role="status"></span>
+          </header>
+          <div class="detail-body">
+            <p id="job-error" class="error" role="alert" hidden></p>
+            <div class="detail-toolbar">
+              <div class="tab-bar" aria-label="任务详情">
+                <button type="button" data-view="results" aria-pressed="false">结果</button>
+                <button type="button" data-view="progress" class="active" aria-pressed="true">进度</button>
+                <button type="button" data-view="log" aria-pressed="false">日志</button>
+              </div>
+              <div class="detail-actions">
+                <button id="cancel" type="button" class="button secondary" hidden>取消任务</button>
+                <button id="resume" type="button" class="button secondary" hidden>续跑任务</button>
+                <button id="copy" type="button" class="button secondary">复制命令</button>
+              </div>
+            </div>
+            <details id="command-panel"><summary>命令行与输出目录</summary><pre id="command"></pre><code id="output-path"></code></details>
+            <div id="progress" class="view-panel">
+              <p id="progress-note" class="muted"></p>
+              <ol id="stage-list"></ol>
+            </div>
+            <div id="log" class="view-panel" hidden><pre id="log-text" tabindex="0"></pre></div>
+            <div id="results" class="view-panel" hidden>
+              <section id="preview-panel" aria-labelledby="preview-title" hidden>
+                <div class="preview-toolbar">
+                  <h3 id="preview-title">成果预览</h3>
+                  <button type="button" id="expand-preview" class="button secondary">放大查看</button>
+                </div>
+                <div id="preview-content">
+                  <div class="preview-toolbar">
+                    <div class="preview-modes" aria-label="预览方式">
+                      <button type="button" data-preview-mode="map" aria-pressed="true">二维高度图</button>
+                      <button type="button" data-preview-mode="lod1" aria-pressed="false">LOD1 三维建筑</button>
+                    </div>
+                    <label for="preview-raster" class="visually-hidden">选择高度栅格</label>
+                    <select id="preview-raster"></select>
+                  </div>
+                  <p id="preview-status" class="muted" role="status"></p>
+                  <div id="preview-map" hidden>
+                    <div class="map-layers" id="map-viewport" tabindex="0" aria-label="二维高度图。方向键平移，加减键缩放，Home 键复位。">
+                      <div class="map-scene" id="map-scene">
+                        <img id="preview-height" alt="按米着色的建筑高度栅格" draggable="false">
+                        <img id="preview-footprints" alt="" draggable="false">
+                      </div>
+                    </div>
+                    <div class="map-controls">
+                      <div class="map-zoom-controls">
+                        <button type="button" id="map-zoom-out" class="button secondary" aria-label="缩小二维图">−</button>
+                        <output id="map-zoom-level" aria-label="二维图缩放比例">100%</output>
+                        <button type="button" id="map-zoom-in" class="button secondary" aria-label="放大二维图">+</button>
+                        <button type="button" id="map-reset" class="button secondary">适应窗口</button>
+                      </div>
+                      <label id="preview-outline-label"><input id="preview-outline" type="checkbox" checked> 建筑轮廓</label>
+                      <p id="preview-meta" class="muted"></p>
+                    </div>
+                    <div id="height-legend" class="height-legend" hidden aria-label="高度图例">
+                      <canvas id="height-colors" width="256" height="12" aria-hidden="true"></canvas>
+                      <div><span>0 米</span><span id="height-max"></span></div>
+                    </div>
+                    <p class="muted map-hint">拖动平移，滚轮或双指捏合缩放。</p>
+                  </div>
+                  <div id="preview-lod1" hidden>
+                    <canvas id="lod1-canvas" tabindex="0" aria-label="建筑三维模型。拖动或使用方向键旋转，滚轮缩放。"></canvas>
+                    <div class="map-controls">
+                      <div class="lod1-controls">
+                        <button type="button" id="lod1-zoom-out" class="button secondary" aria-label="缩小三维模型">−</button>
+                        <button type="button" id="lod1-zoom-in" class="button secondary" aria-label="放大三维模型">+</button>
+                        <button type="button" id="lod1-reset" class="button secondary">复位</button>
+                      </div>
+                      <p id="lod1-meta" class="muted"></p>
+                    </div>
+                    <p class="muted">拖动旋转，滚轮缩放。建筑共用 0 米基底，按提取高度拉伸为平顶。</p>
+                  </div>
+                </div>
+              </section>
+              <p id="result-note" class="muted"></p>
+              <ul id="downloads"></ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <dialog id="earthdata-dialog" aria-labelledby="earthdata-dialog-title">
+    <header class="card-header">
+      <h2 id="earthdata-dialog-title">Earthdata 登录</h2>
+      <button class="button secondary" id="close-earthdata" type="button">关闭</button>
+    </header>
+    <form id="earthdata-form" class="dialog-form" autocomplete="off">
+      <p class="field-note">填写 Earthdata 账号后，本次浏览器会话中的在线运行与续跑会自动复用。</p>
+      <label for="resume-username">Earthdata 登录名</label>
+      <input id="resume-username" name="earthdata_username" autocapitalize="none" spellcheck="false" required>
+      <label for="resume-password">Earthdata 密码</label>
+      <input id="resume-password" name="earthdata_password" type="password" autocomplete="new-password" required>
+      <p class="error" role="alert" id="earthdata-error" hidden></p>
+      <button type="submit" class="button primary">登录并续跑</button>
+    </form>
+  </dialog>
+  <dialog id="preview-dialog" aria-labelledby="preview-dialog-title">
+    <header class="card-header">
+      <h2 id="preview-dialog-title">成果预览</h2>
+      <button class="button secondary" id="close-preview" type="button">关闭大图</button>
+    </header>
+    <div id="preview-dialog-body"></div>
+  </dialog>
+  <dialog id="picker" aria-labelledby="picker-title">
+    <header class="card-header">
+      <h2 id="picker-title">选择本机文件</h2>
+      <button class="button secondary" id="close-picker" type="button">关闭</button>
+    </header>
+    <div class="picker-body">
+      <code id="folder-path"></code>
+      <div class="picker-nav">
+        <button id="roots" class="button secondary" type="button">数据目录</button>
+        <button id="parent" class="button secondary" type="button">上一级</button>
+      </div>
+      <p id="picker-error" class="error" role="alert" hidden></p>
+      <div id="file-entries" class="file-entries"></div>
+      <button id="use-folder" type="button" class="button primary" hidden>使用此目录</button>
+    </div>
+  </dialog>
+</body>
+</html>
